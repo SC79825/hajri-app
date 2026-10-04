@@ -1,0 +1,2670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Hajri - Farm Attendance & Wage Tracker</title>
+  <meta name="description" content="Mobile-first farm attendance checklist, wage & payment ledger, farm diary, and worker records." />
+  <meta property="og:title" content="Hajri - Farm Attendance & Wage Tracker" />
+  <meta property="og:description" content="Mobile-first farm attendance checklist, wage & payment ledger, farm diary, and worker records." />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Hajri">
+  <meta name="theme-color" content="#F2F2F7">
+  <style>
+    :root {
+      --ios-bg: #F2F2F7;
+      --ios-card: #FFFFFF;
+      --ios-text: #000000;
+      --ios-subtext: #6C6C70;
+      --ios-border: rgba(0, 0, 0, 0.08);
+      --ios-green: #28A745;
+      --ios-green-light: #E8F5E9;
+      --ios-red: #DC3545;
+      --ios-red-light: #FFEBEE;
+      --ios-orange: #FD7E14;
+      --ios-orange-light: #FFF3E0;
+      --ios-blue: #007AFF;
+      --ios-blue-light: #E3F2FD;
+      --ios-purple: #5856D6;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--ios-bg);
+      color: var(--ios-text);
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+      padding-top: var(--safe-top);
+      padding-bottom: calc(72px + var(--safe-bottom));
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Container */
+    .app-viewport {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      background: var(--ios-bg);
+    }
+
+    /* Header */
+    .ios-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(242, 242, 247, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--ios-border);
+      padding: 12px 16px;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #1A3926;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand-sub {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ios-subtext);
+    }
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--ios-border);
+      background: var(--ios-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      touch-action: manipulation;
+    }
+    .icon-btn:active {
+      transform: scale(0.94);
+      background: #E5E5EA;
+    }
+
+    /* Main Tab Views */
+    .tab-view {
+      display: none;
+      padding: 14px 16px 24px;
+    }
+    .tab-view.active {
+      display: block;
+      animation: fadeIn 0.18s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--ios-card);
+      border-radius: 16px;
+      border: 1px solid var(--ios-border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    /* Typography */
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--ios-subtext);
+      margin: 16px 4px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .num {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
+    }
+
+    /* Date Bar */
+    .date-navigator {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--ios-card);
+      border-radius: 16px;
+      padding: 6px 8px;
+      margin-bottom: 12px;
+      border: 1px solid var(--ios-border);
+    }
+    .date-nav-btn {
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ios-blue);
+      cursor: pointer;
+      border-radius: 10px;
+    }
+    .date-nav-btn:active {
+      background: var(--ios-blue-light);
+    }
+    .current-date-wrap {
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .current-date-title {
+      font-size: 17px;
+      font-weight: 700;
+    }
+    .current-date-sub {
+      font-size: 12px;
+      color: var(--ios-subtext);
+    }
+    .date-input-hidden {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Attendance Summary Counters */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .summary-card {
+      background: var(--ios-card);
+      border-radius: 14px;
+      padding: 10px 6px;
+      text-align: center;
+      border: 1px solid var(--ios-border);
+    }
+    .summary-val {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .summary-lbl {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ios-subtext);
+      margin-top: 2px;
+    }
+
+    /* Quick Action Buttons */
+    .quick-actions-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .btn-quick {
+      flex: 1;
+      height: 44px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid var(--ios-border);
+      background: var(--ios-card);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-quick.green {
+      background: var(--ios-green-light);
+      color: var(--ios-green);
+      border-color: rgba(40,167,69,0.3);
+    }
+    .btn-quick:active {
+      transform: scale(0.97);
+    }
+
+    /* Worker Attendance Row */
+    .attendance-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--ios-border);
+    }
+    .attendance-row:last-child {
+      border-bottom: none;
+    }
+    .worker-info {
+      flex: 1;
+      min-width: 0;
+      padding-right: 8px;
+    }
+    .worker-name {
+      font-size: 17px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--ios-text);
+    }
+    .worker-meta {
+      font-size: 13px;
+      color: var(--ios-subtext);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .status-btns {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .btn-status {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: 1.5px solid #E5E5EA;
+      background: #F8F9FA;
+      font-size: 16px;
+      font-weight: 800;
+      color: #8E8E93;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+    .btn-status .sub {
+      font-size: 9px;
+      font-weight: 600;
+      margin-top: -2px;
+    }
+    .btn-status.p.active {
+      background: var(--ios-green);
+      color: #FFFFFF;
+      border-color: var(--ios-green);
+      box-shadow: 0 3px 8px rgba(40,167,69,0.35);
+    }
+    .btn-status.half.active {
+      background: var(--ios-orange);
+      color: #FFFFFF;
+      border-color: var(--ios-orange);
+      box-shadow: 0 3px 8px rgba(253,126,20,0.35);
+    }
+    .btn-status.a.active {
+      background: var(--ios-red);
+      color: #FFFFFF;
+      border-color: var(--ios-red);
+      box-shadow: 0 3px 8px rgba(220,53,69,0.35);
+    }
+    .btn-status:active {
+      transform: scale(0.92);
+    }
+
+    /* Wages & Ledger */
+    .ledger-banner {
+      background: linear-gradient(135deg, #1C3E2A 0%, #2A583C 100%);
+      color: #FFFFFF;
+      border-radius: 20px;
+      padding: 18px 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(28,62,42,0.25);
+    }
+    .ledger-banner-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 4px;
+    }
+    .ledger-balance-big {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .ledger-stat-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .ledger-stat-item .val {
+      font-size: 19px;
+      font-weight: 700;
+    }
+    .ledger-stat-item .lbl {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* Worker Ledger Card */
+    .worker-ledger-card {
+      padding: 14px;
+      border-bottom: 1px solid var(--ios-border);
+    }
+    .worker-ledger-card:last-child {
+      border-bottom: none;
+    }
+    .wlc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .wlc-balance {
+      text-align: right;
+    }
+    .wlc-balance-val {
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .wlc-balance-lbl {
+      font-size: 11px;
+      color: var(--ios-subtext);
+    }
+    .wlc-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      background: #F8F9FA;
+      border-radius: 10px;
+      padding: 8px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .wlc-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-pay {
+      flex: 1;
+      height: 42px;
+      background: var(--ios-green);
+      color: #FFFFFF;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .btn-pay:active {
+      transform: scale(0.97);
+    }
+    .btn-history {
+      padding: 0 14px;
+      height: 42px;
+      background: #E5E5EA;
+      color: var(--ios-text);
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* Diary Cards */
+    .diary-card {
+      padding: 14px;
+      border-bottom: 1px solid var(--ios-border);
+    }
+    .diary-card:last-child {
+      border-bottom: none;
+    }
+    .diary-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .diary-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .tag-spray { background: #E8F5E9; color: #2E7D32; }
+    .tag-fert { background: #FFF3E0; color: #E65100; }
+    .tag-other { background: #E3F2FD; color: #1565C0; }
+
+    /* Worker Management Cards */
+    .worker-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px;
+      border-bottom: 1px solid var(--ios-border);
+    }
+    .worker-card:last-child {
+      border-bottom: none;
+    }
+    .worker-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #E8F0FE;
+      color: var(--ios-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      font-weight: 700;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .call-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--ios-green-light);
+      color: var(--ios-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 18px;
+      border: none;
+      margin-right: 6px;
+    }
+
+    /* Bottom Tab Bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--ios-border);
+      height: calc(64px + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 56px;
+      background: transparent;
+      border: none;
+      color: #8E8E93;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+    .tab-item .tab-icon {
+      font-size: 22px;
+      margin-bottom: 2px;
+      line-height: 1;
+    }
+    .tab-item.active {
+      color: #1A3926;
+      font-weight: 700;
+    }
+
+    /* Primary Action Big Buttons */
+    .btn-primary-action {
+      width: 100%;
+      height: 52px;
+      border-radius: 14px;
+      background: #1A3926;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      box-shadow: 0 3px 10px rgba(26,57,38,0.25);
+    }
+    .btn-primary-action:active {
+      transform: scale(0.98);
+      background: #132A1C;
+    }
+
+    /* Modal / Bottom Sheet */
+    .sheet-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .sheet-overlay.active {
+      display: flex;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .sheet-content {
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #FFFFFF;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      padding: 12px 18px calc(24px + var(--safe-bottom));
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .sheet-handle {
+      width: 40px;
+      height: 5px;
+      background: #D1D1D6;
+      border-radius: 3px;
+      margin: 4px auto 14px;
+    }
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .sheet-title {
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .sheet-close {
+      background: #E5E5EA;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ios-subtext);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      height: 50px;
+      border-radius: 12px;
+      border: 1.5px solid #D1D1D6;
+      background: #F8F9FA;
+      font-size: 17px;
+      padding: 0 14px;
+      color: var(--ios-text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: #1A3926;
+      background: #FFFFFF;
+    }
+    .form-textarea {
+      height: 80px;
+      padding: 10px 14px;
+      resize: none;
+    }
+
+    /* Quick Preset Chips */
+    .presets-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .preset-chip {
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: #F2F2F7;
+      border: 1px solid #E5E5EA;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .preset-chip:active {
+      background: #E3F2FD;
+      color: var(--ios-blue);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: calc(16px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%) translateY(-30px);
+      opacity: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: #FFFFFF;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 200;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .empty-state {
+      padding: 36px 16px;
+      text-align: center;
+      color: var(--ios-subtext);
+    }
+    .empty-icon {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+
+    /* Memory / Storage Meter */
+    .storage-card {
+      background: #F8F9FA;
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid #E5E5EA;
+      margin-bottom: 12px;
+    }
+    .storage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .storage-bar-track {
+      background: #E5E5EA;
+      border-radius: 6px;
+      height: 10px;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      margin: 6px 0 8px;
+    }
+    .storage-bar-seg {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    .storage-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--ios-subtext);
+    }
+    .storage-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    /* Period selector buttons */
+    .period-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .period-pill-btn {
+      padding: 10px 8px;
+      border-radius: 10px;
+      border: 1.5px solid #D1D1D6;
+      background: #F8F9FA;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ios-text);
+      cursor: pointer;
+      text-align: center;
+      touch-action: manipulation;
+    }
+    .period-pill-btn.active {
+      background: #1A3926;
+      color: #FFFFFF;
+      border-color: #1A3926;
+    }
+    .clean-checkbox-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: #F8F9FA;
+      border-radius: 10px;
+      border: 1px solid #E5E5EA;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .clean-checkbox-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #1A3926;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-viewport">
+    <!-- Sticky iOS Header -->
+    <header class="ios-header">
+      <div class="header-top">
+        <div>
+          <div class="brand-title">
+            <span>🌾 Hajri</span>
+            <span style="font-size:16px; color:#28A745; font-weight:700;">हाज़िरी</span>
+          </div>
+          <div class="brand-sub" id="headerSubtitle">Farm Attendance & Wages</div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tab 1: Attendance -->
+    <main id="tabAttendance" class="tab-view active">
+      <!-- Date Navigation -->
+      <div class="date-navigator">
+        <button class="date-nav-btn" onclick="changeDate(-1)">‹ Prev</button>
+        <div class="current-date-wrap">
+          <div class="current-date-title" id="displayDateText">Today</div>
+          <div class="current-date-sub" id="displayDateSub">Sat, 03 Oct 2026</div>
+          <input type="date" id="hiddenDateInput" class="date-input-hidden" onchange="onDateInputChange(event)">
+        </div>
+        <button class="date-nav-btn" onclick="changeDate(1)">Next ›</button>
+      </div>
+
+      <!-- Attendance Stats -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-val num" id="statTotalWorkers">0</div>
+          <div class="summary-lbl">Workers / कुल</div>
+        </div>
+        <div class="summary-card" style="background:#E8F5E9;">
+          <div class="summary-val num" style="color:var(--ios-green);" id="statPresent">0</div>
+          <div class="summary-lbl">Present / हाज़िर</div>
+        </div>
+        <div class="summary-card" style="background:#FFF3E0;">
+          <div class="summary-val num" style="color:var(--ios-orange);" id="statHalfDay">0</div>
+          <div class="summary-lbl">½ Day / आधा</div>
+        </div>
+        <div class="summary-card" style="background:#FFEBEE;">
+          <div class="summary-val num" style="color:var(--ios-red);" id="statAbsent">0</div>
+          <div class="summary-lbl">Absent / छुट्टी</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions-bar">
+        <button class="btn-quick green" onclick="markAllAttendance('present')">
+          ✓ Mark All Present (सभी हाज़िर)
+        </button>
+        <button class="btn-quick" onclick="markAllAttendance('absent')">
+          Clear / सब छुट्टी
+        </button>
+      </div>
+
+      <!-- Worker Attendance Checklist -->
+      <div class="section-title">
+        <span>Worker Checklist (मज़दूर सूची)</span>
+        <span class="num" id="todayWageEstimate" style="color:#1A3926; font-size:13px; font-weight:700;">Est: ₹0</span>
+      </div>
+
+      <div class="card" id="attendanceListContainer">
+        <!-- Rendered via JS -->
+      </div>
+    </main>
+
+    <!-- Tab 2: Wages & Payments -->
+    <main id="tabWages" class="tab-view">
+      <!-- Financial Summary Banner -->
+      <div class="ledger-banner">
+        <div class="ledger-banner-title">Total Balance Owed / कुल बाक़ी देनदारी</div>
+        <div class="ledger-balance-big num" id="ledgerTotalPending">₹0</div>
+        <div class="ledger-stat-row">
+          <div class="ledger-stat-item">
+            <div class="val num" id="ledgerTotalEarned">₹0</div>
+            <div class="lbl">Total Earned / कुल कमाई</div>
+          </div>
+          <div class="ledger-stat-item">
+            <div class="val num" id="ledgerTotalPaid">₹0</div>
+            <div class="lbl">Total Paid / कुल भुगतान</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary-action" onclick="openPaymentModal()">
+        <span>+ Record Payment (रुपये दिए / भुगतान जोड़ें)</span>
+      </button>
+
+      <div class="section-title">
+        <span>Worker Ledgers (खाता बही)</span>
+      </div>
+
+      <div class="card" id="workerLedgerListContainer">
+        <!-- Rendered via JS -->
+      </div>
+    </main>
+
+    <!-- Tab 3: Farm Diary -->
+    <main id="tabDiary" class="tab-view">
+      <button class="btn-primary-action" onclick="openDiaryModal()">
+        <span>+ Add Farm Activity (स्प्रे / खाद जोड़ें)</span>
+      </button>
+
+      <div class="section-title">
+        <span>Spray & Fertilizer Logs (खेत डायरी)</span>
+      </div>
+
+      <div class="card" id="diaryListContainer">
+        <!-- Rendered via JS -->
+      </div>
+    </main>
+
+    <!-- Tab 4: Workers Management -->
+    <main id="tabWorkers" class="tab-view">
+      <button class="btn-primary-action" onclick="openWorkerModal()">
+        <span>+ Add New Worker (नया मज़दूर जोड़ें)</span>
+      </button>
+
+      <div class="section-title">
+        <span>All Farm Workers (सभी मज़दूर)</span>
+        <span class="num" id="workersCountBadge">0 workers</span>
+      </div>
+
+      <div class="card" id="workersListContainer">
+        <!-- Rendered via JS -->
+      </div>
+    </main>
+
+    <!-- Bottom Tab Bar -->
+    <nav class="tab-bar">
+      <button class="tab-item active" onclick="switchTab('attendance')">
+        <span class="tab-icon">📋</span>
+        <span>Attendance</span>
+      </button>
+      <button class="tab-item" onclick="switchTab('wages')">
+        <span class="tab-icon">💰</span>
+        <span>Wages</span>
+      </button>
+      <button class="tab-item" onclick="switchTab('diary')">
+        <span class="tab-icon">🌱</span>
+        <span>Farm Diary</span>
+      </button>
+      <button class="tab-item" onclick="switchTab('workers')">
+        <span class="tab-icon">👥</span>
+        <span>Workers</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Bottom Sheet Modals placeholder -->
+  <div id="modalContainer"></div>
+
+  <!-- Toast -->
+  <div id="toastMessage" class="toast">Action Saved</div>
+
+  <script>
+    // --- State & Storage Key ---
+    const STORAGE_KEY = 'hajri_farm_data_v2';
+
+    // Initial default mock data if first time opening app
+    function getDefaultData() {
+      const today = new Date().toISOString().split('T')[0];
+      const d1 = getOffsetDate(-1);
+      const d2 = getOffsetDate(-2);
+      const d3 = getOffsetDate(-3);
+
+      return {
+        workers: [
+          { id: 'w1', name: 'Ramesh Kumar', dailyWage: 450, phone: '9876543210', role: 'Tractor & Harvester', active: true },
+          { id: 'w2', name: 'Suresh Singh', dailyWage: 400, phone: '9876501234', role: 'Irrigation & Spray', active: true },
+          { id: 'w3', name: 'Anita Devi', dailyWage: 350, phone: '', role: 'Weeding & Sowing', active: true },
+          { id: 'w4', name: 'Mukesh Yadav', dailyWage: 400, phone: '9812345678', role: 'General Labor', active: true },
+          { id: 'w5', name: 'Sunita Bai', dailyWage: 350, phone: '', role: 'Weeding & Packing', active: true }
+        ],
+        attendance: {
+          [d3]: { 'w1': 'present', 'w2': 'present', 'w3': 'present', 'w4': 'half', 'w5': 'present' },
+          [d2]: { 'w1': 'present', 'w2': 'present', 'w3': 'present', 'w4': 'present', 'w5': 'present' },
+          [d1]: { 'w1': 'present', 'w2': 'half', 'w3': 'present', 'w4': 'present', 'w5': 'absent' },
+          [today]: { 'w1': 'present', 'w2': 'present', 'w3': 'half', 'w4': 'present', 'w5': 'present' }
+        },
+        payments: [
+          { id: 'p1', workerId: 'w1', amount: 1000, date: d2, method: 'Cash', notes: 'Diesel & weekly advance' },
+          { id: 'p2', workerId: 'w2', amount: 800, date: d1, method: 'Cash', notes: 'Cash advance' },
+          { id: 'p3', workerId: 'w3', amount: 700, date: d1, method: 'Online', notes: 'UPI to bank' }
+        ],
+        diary: [
+          { id: 'd1', date: today, type: 'spray', name: 'Neem Oil + Mancozeb', field: 'Plot 2 (Wheat)', quantity: '500ml / tank', cost: 650, notes: 'Rust prevention spray on young wheat crop' },
+          { id: 'd2', date: d2, type: 'fertilizer', name: 'Urea (45kg bag)', field: 'North Field', quantity: '2 Bags', cost: 580, notes: 'First urea top-dressing after first watering' },
+          { id: 'd3', date: d3, type: 'irrigation', name: 'Tube-well Watering', field: 'Plot 1 & 2', quantity: '8 Hours', cost: 400, notes: 'Electricity & canal water run' }
+        ],
+        settings: {
+          currency: '₹',
+          language: 'bi'
+        }
+      };
+    }
+
+    function getOffsetDate(daysOffset) {
+      const d = new Date();
+      d.setDate(d.getDate() + daysOffset);
+      return d.toISOString().split('T')[0];
+    }
+
+    // App state
+    let appData = null;
+    let selectedDate = new Date().toISOString().split('T')[0];
+    let currentTab = 'attendance';
+
+    // Load Data
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          appData = JSON.parse(raw);
+          // Ensure structure
+          if (!appData.workers) appData.workers = [];
+          if (!appData.attendance) appData.attendance = {};
+          if (!appData.payments) appData.payments = [];
+          if (!appData.diary) appData.diary = [];
+          if (!appData.settings) appData.settings = { currency: '₹' };
+        } else {
+          appData = getDefaultData();
+          saveData();
+        }
+      } catch (e) {
+        console.error('Error loading storage, using default', e);
+        appData = getDefaultData();
+      }
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      } catch (e) {
+        console.error('Save failed', e);
+      }
+    }
+
+    function triggerHaptic() {
+      if (window.navigator && window.navigator.vibrate) {
+        try { window.navigator.vibrate(12); } catch (_) {}
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastMessage');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2200);
+    }
+
+    // Format Helpers
+    function formatCurrency(num) {
+      const symbol = appData.settings.currency || '₹';
+      return `${symbol}${Number(num || 0).toLocaleString('en-IN')}`;
+    }
+
+    function formatDateDisplay(dateStr) {
+      if (!dateStr) return '';
+      const [y, m, d] = dateStr.split('-');
+      const dateObj = new Date(Number(y), Number(m) - 1, Number(d));
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = getOffsetDate(-1);
+
+      let dayTag = '';
+      if (dateStr === today) dayTag = 'Today';
+      else if (dateStr === yesterday) dayTag = 'Yesterday';
+
+      const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+      const formatted = dateObj.toLocaleDateString('en-IN', options);
+
+      return { title: dayTag || formatted, sub: dayTag ? formatted : '' };
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      triggerHaptic();
+      currentTab = tabId;
+
+      // Update tab buttons
+      const tabButtons = document.querySelectorAll('.tab-bar .tab-item');
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+
+      const tabs = ['attendance', 'wages', 'diary', 'workers'];
+      const index = tabs.indexOf(tabId);
+      if (index !== -1 && tabButtons[index]) {
+        tabButtons[index].classList.add('active');
+      }
+
+      // Hide/Show main containers
+      document.getElementById('tabAttendance').classList.toggle('active', tabId === 'attendance');
+      document.getElementById('tabWages').classList.toggle('active', tabId === 'wages');
+      document.getElementById('tabDiary').classList.toggle('active', tabId === 'diary');
+      document.getElementById('tabWorkers').classList.toggle('active', tabId === 'workers');
+
+      // Refresh view
+      if (tabId === 'attendance') renderAttendance();
+      else if (tabId === 'wages') renderWages();
+      else if (tabId === 'diary') renderDiary();
+      else if (tabId === 'workers') renderWorkers();
+
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    // --- TAB 1: Attendance Logic ---
+    function changeDate(delta) {
+      triggerHaptic();
+      const [y, m, d] = selectedDate.split('-');
+      const cur = new Date(Number(y), Number(m) - 1, Number(d));
+      cur.setDate(cur.getDate() + delta);
+      selectedDate = cur.toISOString().split('T')[0];
+      renderAttendance();
+    }
+
+    function onDateInputChange(e) {
+      if (e.target.value) {
+        selectedDate = e.target.value;
+        renderAttendance();
+      }
+    }
+
+    function renderAttendance() {
+      // Date headers
+      const dateInfo = formatDateDisplay(selectedDate);
+      document.getElementById('displayDateText').textContent = dateInfo.title;
+      document.getElementById('displayDateSub').textContent = dateInfo.sub || selectedDate;
+      document.getElementById('hiddenDateInput').value = selectedDate;
+
+      const dayRecords = appData.attendance[selectedDate] || {};
+      const activeWorkers = appData.workers.filter(w => w.active !== false);
+
+      let presentCount = 0;
+      let halfCount = 0;
+      let absentCount = 0;
+      let wageEst = 0;
+
+      activeWorkers.forEach(w => {
+        const st = dayRecords[w.id];
+        if (st === 'present') {
+          presentCount++;
+          wageEst += Number(w.dailyWage || 0);
+        } else if (st === 'half') {
+          halfCount++;
+          wageEst += (Number(w.dailyWage || 0) * 0.5);
+        } else if (st === 'absent') {
+          absentCount++;
+        }
+      });
+
+      document.getElementById('statTotalWorkers').textContent = activeWorkers.length;
+      document.getElementById('statPresent').textContent = presentCount;
+      document.getElementById('statHalfDay').textContent = halfCount;
+      document.getElementById('statAbsent').textContent = absentCount;
+      document.getElementById('todayWageEstimate').textContent = `Est: ${formatCurrency(wageEst)}`;
+
+      // Render Checklist
+      const container = document.getElementById('attendanceListContainer');
+      if (activeWorkers.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">👥</div>
+            <div style="font-weight:700; margin-bottom:4px;">No workers added yet</div>
+            <div style="font-size:13px; margin-bottom:12px;">Add your farm workers in the Workers tab</div>
+            <button class="btn-primary-action" style="max-width:200px; margin:0 auto;" onclick="switchTab('workers')">
+              + Add Worker
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      activeWorkers.forEach(worker => {
+        const status = dayRecords[worker.id] || '';
+        const pActive = status === 'present' ? 'active' : '';
+        const halfActive = status === 'half' ? 'active' : '';
+        const aActive = status === 'absent' ? 'active' : '';
+
+        html += `
+          <div class="attendance-row">
+            <div class="worker-info" onclick="openWorkerStatementModal('${worker.id}')">
+              <div class="worker-name">${escapeHtml(worker.name)}</div>
+              <div class="worker-meta">
+                <span>${formatCurrency(worker.dailyWage)}/day</span>
+                ${worker.role ? `<span>· ${escapeHtml(worker.role)}</span>` : ''}
+              </div>
+            </div>
+            <div class="status-btns">
+              <button class="btn-status p ${pActive}" onclick="setAttendance('${worker.id}', 'present')" title="Present">
+                <span>P</span>
+                <span class="sub">हाज़िर</span>
+              </button>
+              <button class="btn-status half ${halfActive}" onclick="setAttendance('${worker.id}', 'half')" title="Half Day">
+                <span>½</span>
+                <span class="sub">आधा</span>
+              </button>
+              <button class="btn-status a ${aActive}" onclick="setAttendance('${worker.id}', 'absent')" title="Absent">
+                <span>A</span>
+                <span class="sub">छुट्टी</span>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function setAttendance(workerId, newStatus) {
+      triggerHaptic();
+      if (!appData.attendance[selectedDate]) {
+        appData.attendance[selectedDate] = {};
+      }
+
+      // If clicked same status, toggle off
+      if (appData.attendance[selectedDate][workerId] === newStatus) {
+        delete appData.attendance[selectedDate][workerId];
+      } else {
+        appData.attendance[selectedDate][workerId] = newStatus;
+      }
+
+      saveData();
+      renderAttendance();
+    }
+
+    function markAllAttendance(status) {
+      triggerHaptic();
+      if (!appData.attendance[selectedDate]) {
+        appData.attendance[selectedDate] = {};
+      }
+
+      const activeWorkers = appData.workers.filter(w => w.active !== false);
+      activeWorkers.forEach(w => {
+        appData.attendance[selectedDate][w.id] = status;
+      });
+
+      saveData();
+      renderAttendance();
+      showToast(status === 'present' ? 'All Marked Present ✓' : 'All Attendance Cleared');
+    }
+
+    // --- TAB 2: Wages & Payments Logic ---
+    function calculateWorkerFinances(workerId) {
+      const worker = appData.workers.find(w => w.id === workerId);
+      if (!worker) return { daysWorked: 0, earned: 0, paid: 0, balance: 0 };
+
+      let daysWorked = 0;
+      let earned = 0;
+      const rate = Number(worker.dailyWage || 0);
+
+      // Loop through all attendance dates
+      Object.entries(appData.attendance).forEach(([date, records]) => {
+        const st = records[workerId];
+        if (st === 'present') {
+          daysWorked += 1;
+          earned += rate;
+        } else if (st === 'half') {
+          daysWorked += 0.5;
+          earned += (rate * 0.5);
+        }
+      });
+
+      // Sum payments
+      const paid = appData.payments
+        .filter(p => p.workerId === workerId)
+        .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+
+      const balance = earned - paid;
+
+      return { daysWorked, earned, paid, balance };
+    }
+
+    function renderWages() {
+      let grandTotalEarned = 0;
+      let grandTotalPaid = 0;
+      let grandTotalPending = 0;
+
+      const workersWithFinances = appData.workers.map(w => {
+        const fin = calculateWorkerFinances(w.id);
+        grandTotalEarned += fin.earned;
+        grandTotalPaid += fin.paid;
+        if (fin.balance > 0) {
+          grandTotalPending += fin.balance;
+        }
+        return { worker: w, fin };
+      });
+
+      document.getElementById('ledgerTotalEarned').textContent = formatCurrency(grandTotalEarned);
+      document.getElementById('ledgerTotalPaid').textContent = formatCurrency(grandTotalPaid);
+      document.getElementById('ledgerTotalPending').textContent = formatCurrency(grandTotalPending);
+
+      const container = document.getElementById('workerLedgerListContainer');
+      if (workersWithFinances.length === 0) {
+        container.innerHTML = `<div class="empty-state">No workers added yet</div>`;
+        return;
+      }
+
+      let html = '';
+      workersWithFinances.forEach(({ worker, fin }) => {
+        const isPending = fin.balance > 0;
+        const isSettled = fin.balance === 0;
+        const balanceColor = isPending ? 'var(--ios-red)' : (isSettled ? 'var(--ios-green)' : 'var(--ios-blue)');
+        const balanceStatus = isPending ? 'Due / बाक़ी' : (isSettled ? 'Settled / चुकता' : 'Advance / पेशगी');
+
+        html += `
+          <div class="worker-ledger-card">
+            <div class="wlc-header">
+              <div>
+                <div class="worker-name">${escapeHtml(worker.name)}</div>
+                <div class="worker-meta">Rate: ${formatCurrency(worker.dailyWage)}/day</div>
+              </div>
+              <div class="wlc-balance">
+                <div class="wlc-balance-val num" style="color:${balanceColor};">
+                  ${formatCurrency(Math.abs(fin.balance))}
+                </div>
+                <div class="wlc-balance-lbl">${balanceStatus}</div>
+              </div>
+            </div>
+
+            <div class="wlc-details">
+              <div>
+                <div class="num" style="font-weight:700;">${fin.daysWorked} days</div>
+                <div style="color:var(--ios-subtext);">Worked / काम</div>
+              </div>
+              <div>
+                <div class="num" style="font-weight:700;">${formatCurrency(fin.earned)}</div>
+                <div style="color:var(--ios-subtext);">Earned / कुल</div>
+              </div>
+              <div>
+                <div class="num" style="font-weight:700; color:var(--ios-green);">${formatCurrency(fin.paid)}</div>
+                <div style="color:var(--ios-subtext);">Paid / दिया</div>
+              </div>
+            </div>
+
+            <div class="wlc-actions">
+              <button class="btn-pay" onclick="openPaymentModal('${worker.id}')">
+                <span>💰 Pay ${escapeHtml(worker.name.split(' ')[0])}</span>
+              </button>
+              <button class="btn-history" onclick="openWorkerStatementModal('${worker.id}')">
+                Statement / बही 📖
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // Record Payment Modal
+    function openPaymentModal(preselectedWorkerId = '') {
+      triggerHaptic();
+      const today = new Date().toISOString().split('T')[0];
+      const activeWorkers = appData.workers.filter(w => w.active !== false);
+
+      if (activeWorkers.length === 0) {
+        alert('Please add a worker first.');
+        return;
+      }
+
+      const defaultWorkerId = preselectedWorkerId || activeWorkers[0].id;
+      const workerFin = calculateWorkerFinances(defaultWorkerId);
+      const defaultAmount = workerFin.balance > 0 ? workerFin.balance : '';
+
+      const workerOptions = activeWorkers.map(w => {
+        const selected = w.id === defaultWorkerId ? 'selected' : '';
+        const fin = calculateWorkerFinances(w.id);
+        return `<option value="${w.id}" ${selected}>${escapeHtml(w.name)} (Due: ${formatCurrency(fin.balance)})</option>`;
+      }).join('');
+
+      renderModalSheet(`
+        <div class="sheet-header">
+          <div class="sheet-title">Record Payment / रुपये दिए</div>
+          <button class="sheet-close" onclick="closeModal()">✕</button>
+        </div>
+        <form onsubmit="handleSavePayment(event)">
+          <div class="form-group">
+            <label class="form-label">Select Worker (मज़दूर)</label>
+            <select id="payWorkerSelect" class="form-select" onchange="onPaymentWorkerChange(this.value)">
+              ${workerOptions}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Amount Paid (${appData.settings.currency || '₹'})</label>
+            <input type="number" id="payAmountInput" class="form-input num" style="font-size:22px; font-weight:800;" placeholder="0" value="${defaultAmount}" required min="1" step="any">
+            <div class="presets-wrap">
+              <button type="button" class="preset-chip" onclick="addAmountToPayment(500)">+500</button>
+              <button type="button" class="preset-chip" onclick="addAmountToPayment(1000)">+1,000</button>
+              <button type="button" class="preset-chip" onclick="addAmountToPayment(2000)">+2,000</button>
+              <button type="button" class="preset-chip" onclick="setFullBalancePayment()">Full Balance</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Date (तारीख)</label>
+            <input type="date" id="payDateInput" class="form-input" value="${today}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Payment Mode (माध्यम)</label>
+            <select id="payModeSelect" class="form-select">
+              <option value="Cash">Cash (नकद)</option>
+              <option value="Online">Online / UPI (PhonePe / GPay)</option>
+              <option value="Bank">Bank Transfer (बैंक)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Note / Remark (विवरण)</label>
+            <input type="text" id="payNoteInput" class="form-input" placeholder="e.g. Weekly settlement, Festival advance">
+          </div>
+
+          <button type="submit" class="btn-primary-action" style="margin-top:16px;">
+            ✓ Save Payment (भुगतान दर्ज करें)
+          </button>
+        </form>
+      `);
+    }
+
+    function onPaymentWorkerChange(workerId) {
+      const fin = calculateWorkerFinances(workerId);
+      const amtInput = document.getElementById('payAmountInput');
+      if (amtInput && fin.balance > 0) {
+        amtInput.value = fin.balance;
+      }
+    }
+
+    function addAmountToPayment(addVal) {
+      triggerHaptic();
+      const input = document.getElementById('payAmountInput');
+      if (!input) return;
+      const cur = Number(input.value || 0);
+      input.value = cur + addVal;
+    }
+
+    function setFullBalancePayment() {
+      triggerHaptic();
+      const workerId = document.getElementById('payWorkerSelect').value;
+      const fin = calculateWorkerFinances(workerId);
+      const input = document.getElementById('payAmountInput');
+      if (input) {
+        input.value = Math.max(0, fin.balance);
+      }
+    }
+
+    function handleSavePayment(e) {
+      e.preventDefault();
+      triggerHaptic();
+
+      const workerId = document.getElementById('payWorkerSelect').value;
+      const amount = Number(document.getElementById('payAmountInput').value);
+      const date = document.getElementById('payDateInput').value;
+      const method = document.getElementById('payModeSelect').value;
+      const notes = document.getElementById('payNoteInput').value.trim();
+
+      if (!workerId || isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount.');
+        return;
+      }
+
+      appData.payments.unshift({
+        id: 'p_' + Date.now(),
+        workerId,
+        amount,
+        date,
+        method,
+        notes
+      });
+
+      saveData();
+      closeModal();
+      showToast('Payment Saved Successfully ✓');
+      if (currentTab === 'wages') renderWages();
+    }
+
+    // Worker Statement Passbook Modal
+    function openWorkerStatementModal(workerId) {
+      triggerHaptic();
+      const worker = appData.workers.find(w => w.id === workerId);
+      if (!worker) return;
+
+      const fin = calculateWorkerFinances(workerId);
+
+      // Collect all attendance logs for this worker
+      const attendanceLogs = [];
+      Object.entries(appData.attendance).forEach(([date, rec]) => {
+        if (rec[workerId]) {
+          attendanceLogs.push({ date, status: rec[workerId] });
+        }
+      });
+      attendanceLogs.sort((a, b) => b.date.localeCompare(a.date));
+
+      // Worker payments
+      const workerPayments = appData.payments.filter(p => p.workerId === workerId);
+      workerPayments.sort((a, b) => b.date.localeCompare(a.date));
+
+      let attendanceRowsHtml = attendanceLogs.length === 0
+        ? '<div style="padding:10px; color:var(--ios-subtext); text-align:center;">No attendance marked yet</div>'
+        : attendanceLogs.map(log => {
+            const stColor = log.status === 'present' ? 'var(--ios-green)' : (log.status === 'half' ? 'var(--ios-orange)' : 'var(--ios-red)');
+            const stLabel = log.status === 'present' ? 'Full Day (पूरा दिन)' : (log.status === 'half' ? 'Half Day (आधा दिन)' : 'Absent (छुट्टी)');
+            return `
+              <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #EFEFF4; font-size:14px;">
+                <span>${log.date}</span>
+                <span style="font-weight:700; color:${stColor};">${stLabel}</span>
+              </div>
+            `;
+          }).join('');
+
+      let paymentRowsHtml = workerPayments.length === 0
+        ? '<div style="padding:10px; color:var(--ios-subtext); text-align:center;">No payments recorded yet</div>'
+        : workerPayments.map(p => {
+            return `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #EFEFF4;">
+                <div>
+                  <div class="num" style="font-weight:700; font-size:16px; color:var(--ios-green);">${formatCurrency(p.amount)}</div>
+                  <div style="font-size:12px; color:var(--ios-subtext);">${p.date} · ${p.method}${p.notes ? ` · ${escapeHtml(p.notes)}` : ''}</div>
+                </div>
+                <button onclick="deletePayment('${p.id}', '${workerId}')" style="background:transparent; border:none; color:var(--ios-red); font-size:16px; cursor:pointer; padding:6px;">🗑️</button>
+              </div>
+            `;
+          }).join('');
+
+      renderModalSheet(`
+        <div class="sheet-header">
+          <div>
+            <div class="sheet-title">${escapeHtml(worker.name)}</div>
+            <div style="font-size:13px; color:var(--ios-subtext);">Rate: ${formatCurrency(worker.dailyWage)}/day ${worker.phone ? `· 📞 ${escapeHtml(worker.phone)}` : ''}</div>
+          </div>
+          <button class="sheet-close" onclick="closeModal()">✕</button>
+        </div>
+
+        <div style="background:#F2F2F7; border-radius:14px; padding:14px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span style="color:var(--ios-subtext);">Total Days Worked:</span>
+            <span class="num" style="font-weight:700;">${fin.daysWorked} days</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span style="color:var(--ios-subtext);">Total Wages Earned:</span>
+            <span class="num" style="font-weight:700;">${formatCurrency(fin.earned)}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span style="color:var(--ios-subtext);">Total Amount Paid:</span>
+            <span class="num" style="font-weight:700; color:var(--ios-green);">${formatCurrency(fin.paid)}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding-top:8px; border-top:1px solid #D1D1D6;">
+            <span style="font-weight:700;">Balance Due / बाक़ी:</span>
+            <span class="num" style="font-size:20px; font-weight:800; color:${fin.balance > 0 ? 'var(--ios-red)' : 'var(--ios-green)'};">
+              ${formatCurrency(fin.balance)}
+            </span>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:16px;">
+          <button class="btn-pay" onclick="openPaymentModal('${worker.id}')">
+            + Record Payment
+          </button>
+          <button class="btn-history" onclick="shareWorkerStatementViaWhatsApp('${worker.id}')" style="background:#25D366; color:#FFF; display:flex; align-items:center; gap:6px;">
+            WhatsApp Share 💬
+          </button>
+        </div>
+
+        <div class="section-title"><span>Payment History (दिए गए रुपये)</span></div>
+        <div style="margin-bottom:14px;">${paymentRowsHtml}</div>
+
+        <div class="section-title"><span>Attendance Log (हाज़िरी रिकॉर्ड)</span></div>
+        <div style="max-height:200px; overflow-y:auto; margin-bottom:14px;">${attendanceRowsHtml}</div>
+      `);
+    }
+
+    function deletePayment(paymentId, workerId) {
+      if (confirm('Delete this payment entry? (यह भुगतान हटाएं?)')) {
+        appData.payments = appData.payments.filter(p => p.id !== paymentId);
+        saveData();
+        showToast('Payment Deleted');
+        openWorkerStatementModal(workerId);
+        if (currentTab === 'wages') renderWages();
+      }
+    }
+
+    function shareWorkerStatementViaWhatsApp(workerId) {
+      triggerHaptic();
+      const worker = appData.workers.find(w => w.id === workerId);
+      if (!worker) return;
+      const fin = calculateWorkerFinances(workerId);
+
+      const text = `🌾 *Hajri Farm Ledger - ${worker.name}*\n`
+        + `Daily Rate: ${formatCurrency(worker.dailyWage)}/day\n`
+        + `Total Days Worked: ${fin.daysWorked} days\n`
+        + `Total Earned: ${formatCurrency(fin.earned)}\n`
+        + `Total Paid: ${formatCurrency(fin.paid)}\n`
+        + `*Balance Due: ${formatCurrency(fin.balance)}*\n`
+        + `Generated on: ${new Date().toLocaleDateString('en-IN')}`;
+
+      // Clean phone number: remove non-digits
+      let cleanPhone = (worker.phone || '').replace(/[^0-9]/g, '');
+      // If 10 digits (standard Indian mobile), prepend 91 country code
+      if (cleanPhone.length === 10) {
+        cleanPhone = '91' + cleanPhone;
+      }
+
+      // If worker has phone, open their chat directly; otherwise open WhatsApp contact picker
+      const baseUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : `https://wa.me/`;
+      const url = `${baseUrl}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    // --- TAB 3: Farm Diary Logic ---
+    function renderDiary() {
+      const container = document.getElementById('diaryListContainer');
+      const diaryEntries = [...appData.diary].sort((a, b) => b.date.localeCompare(a.date));
+
+      if (diaryEntries.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🌱</div>
+            <div style="font-weight:700; margin-bottom:4px;">No farm entries logged</div>
+            <div style="font-size:13px; margin-bottom:12px;">Track your pesticide sprays, fertilizer bags, and field costs</div>
+            <button class="btn-primary-action" style="max-width:200px; margin:0 auto;" onclick="openDiaryModal()">
+              + Add First Entry
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      diaryEntries.forEach(item => {
+        let tagClass = 'tag-other';
+        let typeName = 'Activity';
+        if (item.type === 'spray') { tagClass = 'tag-spray'; typeName = 'Spray (दवाई)'; }
+        else if (item.type === 'fertilizer') { tagClass = 'tag-fert'; typeName = 'Fertilizer (खाद)'; }
+        else if (item.type === 'irrigation') { tagClass = 'tag-other'; typeName = 'Irrigation (पानी)'; }
+
+        html += `
+          <div class="diary-card">
+            <div class="diary-top">
+              <span class="diary-tag ${tagClass}">${typeName}</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="num" style="font-size:13px; color:var(--ios-subtext);">${item.date}</span>
+                <button onclick="deleteDiaryEntry('${item.id}')" style="background:transparent; border:none; color:var(--ios-subtext); cursor:pointer;">✕</button>
+              </div>
+            </div>
+
+            <div style="font-size:17px; font-weight:700; margin-bottom:4px;">${escapeHtml(item.name)}</div>
+
+            <div style="font-size:13px; color:var(--ios-subtext); display:flex; flex-wrap:wrap; gap:10px; margin-bottom:6px;">
+              ${item.field ? `<span>📍 Field: <b>${escapeHtml(item.field)}</b></span>` : ''}
+              ${item.quantity ? `<span>⚖️ Qty: <b>${escapeHtml(item.quantity)}</b></span>` : ''}
+              ${item.cost ? `<span>💰 Cost: <b class="num">${formatCurrency(item.cost)}</b></span>` : ''}
+            </div>
+
+            ${item.notes ? `<div style="font-size:13px; background:#F8F9FA; padding:8px 10px; border-radius:8px; color:#3C3C43;">${escapeHtml(item.notes)}</div>` : ''}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function openDiaryModal() {
+      triggerHaptic();
+      const today = new Date().toISOString().split('T')[0];
+
+      renderModalSheet(`
+        <div class="sheet-header">
+          <div class="sheet-title">Farm Diary / स्प्रे व खाद</div>
+          <button class="sheet-close" onclick="closeModal()">✕</button>
+        </div>
+        <form onsubmit="handleSaveDiary(event)">
+          <div class="form-group">
+            <label class="form-label">Date (तारीख)</label>
+            <input type="date" id="diaryDate" class="form-input" value="${today}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Activity Type (प्रकार)</label>
+            <select id="diaryType" class="form-select" onchange="onDiaryTypeChange(this.value)">
+              <option value="spray">Pesticide / Spray (कीटनाशक / स्प्रे)</option>
+              <option value="fertilizer">Fertilizer (खाद / उर्वरक)</option>
+              <option value="irrigation">Irrigation / Watering (सिंचाई)</option>
+              <option value="other">Other Farm Work (अन्य काम)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Name of Chemical / Fertilizer (नाम)</label>
+            <input type="text" id="diaryName" class="form-input" placeholder="e.g. Urea, DAP, Neem Oil, Mancozeb" required>
+            <div class="presets-wrap" id="diaryPresetsWrap">
+              <button type="button" class="preset-chip" onclick="selectDiaryPreset('Urea (45kg)')">Urea</button>
+              <button type="button" class="preset-chip" onclick="selectDiaryPreset('DAP 18:46')">DAP</button>
+              <button type="button" class="preset-chip" onclick="selectDiaryPreset('NPK 19-19-19')">NPK</button>
+              <button type="button" class="preset-chip" onclick="selectDiaryPreset('Neem Oil Spray')">Neem Oil</button>
+              <button type="button" class="preset-chip" onclick="selectDiaryPreset('Mancozeb Fungicide')">Mancozeb</button>
+              <button type="button" class="preset-chip" onclick="selectDiaryPreset('Weedicide Spray')">Weedicide</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Field / Plot / Crop (खेत या फसल)</label>
+            <input type="text" id="diaryField" class="form-input" placeholder="e.g. North Plot, Wheat Crop, Orchard">
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div class="form-group">
+              <label class="form-label">Quantity / Dosage (मात्रा)</label>
+              <input type="text" id="diaryQty" class="form-input" placeholder="e.g. 2 Bags, 500ml">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cost Incurred (${appData.settings.currency || '₹'})</label>
+              <input type="number" id="diaryCost" class="form-input num" placeholder="0" min="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notes / Remarks (अन्य विवरण)</label>
+            <textarea id="diaryNotes" class="form-textarea" placeholder="Pest observed, water source, weather, etc."></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary-action" style="margin-top:14px;">
+            ✓ Save Entry (डायरी में दर्ज करें)
+          </button>
+        </form>
+      `);
+    }
+
+    function selectDiaryPreset(val) {
+      triggerHaptic();
+      const input = document.getElementById('diaryName');
+      if (input) input.value = val;
+    }
+
+    function onDiaryTypeChange(type) {
+      const presetsWrap = document.getElementById('diaryPresetsWrap');
+      if (!presetsWrap) return;
+      if (type === 'spray') {
+        presetsWrap.innerHTML = `
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Neem Oil Spray')">Neem Oil</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Mancozeb Fungicide')">Mancozeb</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Chlorpyrifos')">Chlorpyrifos</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Glyphosate Weedicide')">Glyphosate</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Coragen')">Coragen</button>
+        `;
+      } else if (type === 'fertilizer') {
+        presetsWrap.innerHTML = `
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Urea (45kg)')">Urea</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('DAP 18:46')">DAP</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('NPK 19-19-19')">NPK</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Potash MOP')">Potash</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Zinc Sulphate')">Zinc</button>
+        `;
+      } else {
+        presetsWrap.innerHTML = `
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Tube-well Irrigation')">Tubewell</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Canal Water (नहरी पानी)')">Canal</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Tractor Ploughing (जुताई)')">Ploughing</button>
+          <button type="button" class="preset-chip" onclick="selectDiaryPreset('Harvester Rent (कटाई)')">Harvesting</button>
+        `;
+      }
+    }
+
+    function handleSaveDiary(e) {
+      e.preventDefault();
+      triggerHaptic();
+
+      const date = document.getElementById('diaryDate').value;
+      const type = document.getElementById('diaryType').value;
+      const name = document.getElementById('diaryName').value.trim();
+      const field = document.getElementById('diaryField').value.trim();
+      const quantity = document.getElementById('diaryQty').value.trim();
+      const cost = Number(document.getElementById('diaryCost').value || 0);
+      const notes = document.getElementById('diaryNotes').value.trim();
+
+      if (!name) return;
+
+      appData.diary.unshift({
+        id: 'd_' + Date.now(),
+        date,
+        type,
+        name,
+        field,
+        quantity,
+        cost,
+        notes
+      });
+
+      saveData();
+      closeModal();
+      showToast('Diary Entry Saved ✓');
+      if (currentTab === 'diary') renderDiary();
+    }
+
+    function deleteDiaryEntry(id) {
+      if (confirm('Delete this diary log? (यह एंट्री हटाएं?)')) {
+        appData.diary = appData.diary.filter(d => d.id !== id);
+        saveData();
+        showToast('Entry Removed');
+        renderDiary();
+      }
+    }
+
+    // --- TAB 4: Workers Management Logic ---
+    function renderWorkers() {
+      const container = document.getElementById('workersListContainer');
+      const workers = appData.workers;
+
+      document.getElementById('workersCountBadge').textContent = `${workers.length} workers`;
+
+      if (workers.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">👥</div>
+            <div style="font-weight:700; margin-bottom:4px;">No workers added</div>
+            <div style="font-size:13px; margin-bottom:12px;">Add your farm laborers with their daily wage rate</div>
+            <button class="btn-primary-action" style="max-width:200px; margin:0 auto;" onclick="openWorkerModal()">
+              + Add Worker
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      workers.forEach(w => {
+        const initials = w.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        const fin = calculateWorkerFinances(w.id);
+
+        html += `
+          <div class="worker-card">
+            <div style="display:flex; align-items:center; flex:1; min-width:0;">
+              <div class="worker-avatar">${initials}</div>
+              <div style="min-width:0;">
+                <div class="worker-name">${escapeHtml(w.name)}</div>
+                <div class="worker-meta">
+                  <span style="font-weight:700; color:#1A3926;">${formatCurrency(w.dailyWage)}/day</span>
+                  ${w.role ? `<span>· ${escapeHtml(w.role)}</span>` : ''}
+                </div>
+                <div style="font-size:11px; color:var(--ios-subtext); margin-top:2px;">
+                  Worked: <b>${fin.daysWorked} days</b> · Due: <b style="color:${fin.balance > 0 ? 'var(--ios-red)' : 'var(--ios-green)'};">${formatCurrency(fin.balance)}</b>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center;">
+              ${w.phone ? `<a href="tel:${escapeHtml(w.phone)}" class="call-btn" title="Call Worker">📞</a>` : ''}
+              <button onclick="openWorkerModal('${w.id}')" style="background:#E5E5EA; border:none; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:600; cursor:pointer; margin-right:6px;">Edit</button>
+              <button onclick="deleteWorker('${w.id}')" style="background:transparent; border:none; color:var(--ios-red); font-size:16px; cursor:pointer; padding:6px;">🗑️</button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function openWorkerModal(workerId = '') {
+      triggerHaptic();
+      const isEdit = Boolean(workerId);
+      const worker = isEdit ? appData.workers.find(w => w.id === workerId) : null;
+
+      const title = isEdit ? 'Edit Worker (मज़दूर बदलें)' : 'Add New Worker (नया मज़दूर)';
+      const nameVal = worker ? escapeHtml(worker.name) : '';
+      const wageVal = worker ? worker.dailyWage : 400;
+      const phoneVal = worker ? escapeHtml(worker.phone || '') : '';
+      const roleVal = worker ? escapeHtml(worker.role || '') : '';
+
+      renderModalSheet(`
+        <div class="sheet-header">
+          <div class="sheet-title">${title}</div>
+          <button class="sheet-close" onclick="closeModal()">✕</button>
+        </div>
+        <form onsubmit="handleSaveWorker(event, '${workerId}')">
+          <div class="form-group">
+            <label class="form-label">Full Name (मज़दूर का नाम)</label>
+            <input type="text" id="wName" class="form-input" style="font-size:18px; font-weight:700;" placeholder="e.g. Ramesh Kumar" value="${nameVal}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Daily Wage Rate (${appData.settings.currency || '₹'} / दिन)</label>
+            <input type="number" id="wWage" class="form-input num" style="font-size:20px; font-weight:700;" placeholder="400" value="${wageVal}" required min="0" step="any">
+            <div class="presets-wrap">
+              <button type="button" class="preset-chip" onclick="document.getElementById('wWage').value=350">350/day</button>
+              <button type="button" class="preset-chip" onclick="document.getElementById('wWage').value=400">400/day</button>
+              <button type="button" class="preset-chip" onclick="document.getElementById('wWage').value=450">450/day</button>
+              <button type="button" class="preset-chip" onclick="document.getElementById('wWage').value=500">500/day</button>
+              <button type="button" class="preset-chip" onclick="document.getElementById('wWage').value=600">600/day</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone Number (फ़ोन नंबर - Optional)</label>
+            <input type="tel" id="wPhone" class="form-input" placeholder="e.g. 9876543210" value="${phoneVal}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Role / Work Type (काम का प्रकार)</label>
+            <input type="text" id="wRole" class="form-input" placeholder="e.g. Weeding, Tractor, Harvester, Spray" value="${roleVal}">
+          </div>
+
+          <button type="submit" class="btn-primary-action" style="margin-top:16px;">
+            ✓ ${isEdit ? 'Save Changes (बदलाव सहेजें)' : 'Add Worker (मज़दूर जोड़ें)'}
+          </button>
+        </form>
+      `);
+    }
+
+    function handleSaveWorker(e, workerId) {
+      e.preventDefault();
+      triggerHaptic();
+
+      const name = document.getElementById('wName').value.trim();
+      const dailyWage = Number(document.getElementById('wWage').value || 0);
+      const phone = document.getElementById('wPhone').value.trim();
+      const role = document.getElementById('wRole').value.trim();
+
+      if (!name) return;
+
+      if (workerId) {
+        // Edit
+        const target = appData.workers.find(w => w.id === workerId);
+        if (target) {
+          target.name = name;
+          target.dailyWage = dailyWage;
+          target.phone = phone;
+          target.role = role;
+        }
+        showToast('Worker Updated ✓');
+      } else {
+        // Add
+        const newWorker = {
+          id: 'w_' + Date.now(),
+          name,
+          dailyWage,
+          phone,
+          role,
+          active: true
+        };
+        appData.workers.push(newWorker);
+        showToast('Worker Added ✓');
+      }
+
+      saveData();
+      closeModal();
+      if (currentTab === 'workers') renderWorkers();
+      if (currentTab === 'attendance') renderAttendance();
+      if (currentTab === 'wages') renderWages();
+    }
+
+    function deleteWorker(workerId) {
+      const worker = appData.workers.find(w => w.id === workerId);
+      if (!worker) return;
+
+      if (confirm(`Are you sure you want to remove "${worker.name}"? Past records will be preserved.`)) {
+        appData.workers = appData.workers.filter(w => w.id !== workerId);
+        saveData();
+        showToast('Worker Removed');
+        renderWorkers();
+      }
+    }
+
+    // --- Settings Modal ---
+    function getStorageStats() {
+      const rawData = localStorage.getItem(STORAGE_KEY) || '';
+      const usedBytes = new Blob([rawData]).size;
+      const totalLocalBytes = new Blob([Object.values(localStorage).join('')]).size;
+      const quotaBytes = 5 * 1024 * 1024; // 5 MB standard web localStorage quota
+      const leftBytes = Math.max(0, quotaBytes - totalLocalBytes);
+      const usedPercent = Math.min(100, (totalLocalBytes / quotaBytes) * 100);
+
+      const attendanceDays = Object.keys(appData.attendance || {}).length;
+      let totalAttendanceEntries = 0;
+      Object.values(appData.attendance || {}).forEach(day => {
+        totalAttendanceEntries += Object.keys(day).length;
+      });
+      const paymentsCount = (appData.payments || []).length;
+      const diaryCount = (appData.diary || []).length;
+      const workersCount = (appData.workers || []).length;
+
+      const totalRecords = (totalAttendanceEntries + paymentsCount + diaryCount) || 1;
+      const attPct = Math.round((totalAttendanceEntries / totalRecords) * 100);
+      const payPct = Math.round((paymentsCount / totalRecords) * 100);
+      const diaryPct = Math.max(0, 100 - attPct - payPct);
+
+      return {
+        usedBytes,
+        usedFormatted: formatBytes(usedBytes),
+        leftBytes,
+        leftFormatted: formatBytes(leftBytes),
+        usedPercentStr: usedPercent < 0.1 ? '<0.1%' : usedPercent.toFixed(1) + '%',
+        workersCount,
+        attendanceDays,
+        totalAttendanceEntries,
+        paymentsCount,
+        diaryCount,
+        attPct,
+        payPct,
+        diaryPct
+      };
+    }
+
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function openSettingsModal() {
+      triggerHaptic();
+      const cur = appData.settings.currency || '₹';
+      const stats = getStorageStats();
+
+      renderModalSheet(`
+        <div class="sheet-header">
+          <div class="sheet-title">Farm Settings / सेटिंग्स ⚙️</div>
+          <button class="sheet-close" onclick="closeModal()">✕</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Currency Symbol (मुद्रा)</label>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-quick ${cur === '₹' ? 'green' : ''}" onclick="setCurrency('₹')">₹ Rupee</button>
+            <button class="btn-quick ${cur === '$' ? 'green' : ''}" onclick="setCurrency('$')">$ Dollar</button>
+            <button class="btn-quick ${cur === '€' ? 'green' : ''}" onclick="setCurrency('€')">€ Euro</button>
+            <button class="btn-quick ${cur === '£' ? 'green' : ''}" onclick="setCurrency('£')">£ Pound</button>
+          </div>
+        </div>
+
+        <!-- Storage & Memory Meter -->
+        <div class="section-title"><span>Storage & Memory (मेमोरी उपयोग)</span></div>
+        <div class="storage-card">
+          <div class="storage-header">
+            <div>
+              <span style="font-weight:800; font-size:15px; color:#1A3926;">${stats.usedFormatted}</span>
+              <span style="font-size:12px; color:var(--ios-subtext);"> used (${stats.usedPercentStr})</span>
+            </div>
+            <div style="font-weight:700; font-size:12px; color:#28A745;">
+              ${stats.leftFormatted} left (~5 MB)
+            </div>
+          </div>
+          <div class="storage-bar-track">
+            <div class="storage-bar-seg" style="width:${Math.max(stats.attPct, 15)}%; background:#28A745;" title="Attendance"></div>
+            <div class="storage-bar-seg" style="width:${Math.max(stats.payPct, 10)}%; background:#FD7E14;" title="Payments"></div>
+            <div class="storage-bar-seg" style="width:${Math.max(stats.diaryPct, 10)}%; background:#007AFF;" title="Farm Diary"></div>
+          </div>
+          <div class="storage-legend">
+            <span><span class="storage-dot" style="background:#28A745;"></span>${stats.attendanceDays} Attendance Days</span>
+            <span><span class="storage-dot" style="background:#FD7E14;"></span>${stats.paymentsCount} Payments</span>
+            <span><span class="storage-dot" style="background:#007AFF;"></span>${stats.diaryCount} Diary Logs</span>
+          </div>
+        </div>
+
+        <button class="btn-quick" onclick="openDataCleanupModal()" style="justify-content:center; height:46px; background:#FFF3E0; color:#E65100; font-weight:700; border:1px solid #FFE0B2; margin-bottom:14px;">
+          🧹 Clean Up Old Data (पुराना डेटा हटाएं)
+        </button>
+
+        <div class="section-title"><span>Data & Backup (डेटा बैकअप)</span></div>
+
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+          <button class="btn-quick" onclick="exportDataExcel()" style="justify-content:center; height:46px; background:#E8F5E9; color:#1C3E2A; font-weight:700; border:1px solid #C8E6C9;">
+            📊 Download Excel File (.xls)
+          </button>
+          <button class="btn-quick" onclick="exportDataJson()" style="justify-content:center; height:46px;">
+            📥 Download Backup File (.json)
+          </button>
+          <label class="btn-quick" style="justify-content:center; height:46px; cursor:pointer;">
+            📤 Restore Backup File
+            <input type="file" accept=".json" onchange="importDataJson(event)" style="display:none;">
+          </label>
+          <button class="btn-quick" onclick="resetToSampleData()" style="justify-content:center; height:46px; color:var(--ios-orange);">
+            🔄 Reset to Sample Farm Data
+          </button>
+        </div>
+
+        <div style="padding:12px; background:#F2F2F7; border-radius:12px; font-size:12px; color:var(--ios-subtext); line-height:1.5;">
+          <b>🌾 Hajri App</b> · 100% Offline & Private on this device.<br>
+          All worker attendance, wages, and diary logs are stored directly in your phone's browser storage.
+        </div>
+      `);
+    }
+
+    // --- Clean Up Old Data Module ---
+    let cleanupConfig = {
+      period: '6m',
+      cleanAttendance: true,
+      cleanDiary: true,
+      cleanPayments: false,
+      fromDate: '',
+      toDate: ''
+    };
+
+    function openDataCleanupModal() {
+      triggerHaptic();
+      cleanupConfig.period = '6m';
+      cleanupConfig.cleanAttendance = true;
+      cleanupConfig.cleanDiary = true;
+      cleanupConfig.cleanPayments = false;
+
+      // Default custom dates to 6 months ago to today
+      const now = new Date();
+      const sixAgo = new Date();
+      sixAgo.setMonth(sixAgo.getMonth() - 6);
+      cleanupConfig.toDate = now.toISOString().split('T')[0];
+      cleanupConfig.fromDate = sixAgo.toISOString().split('T')[0];
+
+      renderCleanupModalView();
+    }
+
+    function renderCleanupModalView() {
+      const matches = getCleanupMatches();
+
+      renderModalSheet(`
+        <div class="sheet-header">
+          <div>
+            <div class="sheet-title">Clean Up Old Data / डेटा सफ़ाई 🧹</div>
+            <div style="font-size:12px; color:var(--ios-subtext);">Remove older records to free up space</div>
+          </div>
+          <button class="sheet-close" onclick="openSettingsModal()">✕</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Time Period (समय सीमा)</label>
+          <div class="period-grid">
+            <button type="button" class="period-pill-btn ${cleanupConfig.period === '6m' ? 'active' : ''}" onclick="setCleanupPeriod('6m')">
+              Older than 6 Months<br><span style="font-size:10px; font-weight:normal;">6 महीने से पुराना</span>
+            </button>
+            <button type="button" class="period-pill-btn ${cleanupConfig.period === '1y' ? 'active' : ''}" onclick="setCleanupPeriod('1y')">
+              Older than 1 Year<br><span style="font-size:10px; font-weight:normal;">1 साल से पुराना</span>
+            </button>
+            <button type="button" class="period-pill-btn ${cleanupConfig.period === '2y' ? 'active' : ''}" onclick="setCleanupPeriod('2y')">
+              Older than 2 Years<br><span style="font-size:10px; font-weight:normal;">2 साल से पुराना</span>
+            </button>
+            <button type="button" class="period-pill-btn ${cleanupConfig.period === '5y' ? 'active' : ''}" onclick="setCleanupPeriod('5y')">
+              Older than 5 Years<br><span style="font-size:10px; font-weight:normal;">5 साल से पुराना</span>
+            </button>
+          </div>
+          <button type="button" class="period-pill-btn ${cleanupConfig.period === 'custom' ? 'active' : ''}" style="width:100%; margin-bottom:8px;" onclick="setCleanupPeriod('custom')">
+            📅 Custom Date Range (तारीख चुनकर हटाएं)
+          </button>
+        </div>
+
+        <!-- Custom Date Range inputs -->
+        <div id="customRangeBox" style="display:${cleanupConfig.period === 'custom' ? 'block' : 'none'}; background:#F2F2F7; padding:12px; border-radius:12px; margin-bottom:12px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div>
+              <label class="form-label" style="font-size:11px;">From Date (शुरुआती तारीख)</label>
+              <input type="date" id="cleanupFrom" class="form-input" value="${cleanupConfig.fromDate}" onchange="onCustomDateChange()">
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px;">To Date (अंतिम तारीख)</label>
+              <input type="date" id="cleanupTo" class="form-input" value="${cleanupConfig.toDate}" onchange="onCustomDateChange()">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Records to Delete (क्या-क्या हटाएं)</label>
+          <label class="clean-checkbox-row">
+            <div>
+              <div style="font-weight:700; font-size:14px;">Daily Attendance Logs (हाज़िरी)</div>
+              <div style="font-size:11px; color:var(--ios-subtext);">Historical daily checklist records</div>
+            </div>
+            <input type="checkbox" id="chkCleanAtt" ${cleanupConfig.cleanAttendance ? 'checked' : ''} onchange="toggleCleanupType('cleanAttendance', this.checked)">
+          </label>
+          <label class="clean-checkbox-row">
+            <div>
+              <div style="font-weight:700; font-size:14px;">Farm Diary Logs (स्प्रे व खाद)</div>
+              <div style="font-size:11px; color:var(--ios-subtext);">Pesticide, fertilizer & field activity entries</div>
+            </div>
+            <input type="checkbox" id="chkCleanDiary" ${cleanupConfig.cleanDiary ? 'checked' : ''} onchange="toggleCleanupType('cleanDiary', this.checked)">
+          </label>
+          <label class="clean-checkbox-row">
+            <div>
+              <div style="font-weight:700; font-size:14px;">Past Payment Records (दिए गए रुपये)</div>
+              <div style="font-size:11px; color:var(--ios-subtext);">Optional: Historical cash/UPI transactions</div>
+            </div>
+            <input type="checkbox" id="chkCleanPay" ${cleanupConfig.cleanPayments ? 'checked' : ''} onchange="toggleCleanupType('cleanPayments', this.checked)">
+          </label>
+        </div>
+
+        <!-- Safe Notice -->
+        <div style="background:#E8F5E9; border-radius:10px; padding:10px 12px; font-size:12px; color:#1C3E2A; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">🛡️</span>
+          <span><b>Worker Profiles Protected:</b> Worker names, rates, and phone numbers are NEVER deleted.</span>
+        </div>
+
+        <!-- Impact Counter Banner -->
+        <div id="cleanupImpactBanner" style="background:#FFF3E0; border:1px solid #FFE0B2; border-radius:12px; padding:12px; margin-bottom:14px; text-align:center;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:#E65100;">Records Found to Remove / कुल रिकॉर्ड</div>
+          <div class="num" style="font-size:24px; font-weight:800; color:#E65100; margin:2px 0;">
+            ${matches.totalToDelete} records
+          </div>
+          <div style="font-size:12px; color:var(--ios-subtext);">
+            ${matches.attDays} Attendance Days · ${matches.diaryCount} Diary Logs · ${matches.payCount} Payments
+          </div>
+        </div>
+
+        <!-- Recommended Safety Backup -->
+        <div style="margin-bottom:12px;">
+          <button type="button" class="btn-quick" onclick="exportDataExcel()" style="justify-content:center; height:42px; background:#E8F5E9; color:#1C3E2A; font-weight:700; border:1px solid #C8E6C9;">
+            📊 Download Excel (.xls) Backup First
+          </button>
+        </div>
+
+        <!-- Final Delete Trigger -->
+        <button type="button" class="btn-primary-action" onclick="executeDataCleanup()" style="background:#DC3545; box-shadow:0 3px 10px rgba(220,53,69,0.3);">
+          🗑️ Delete ${matches.totalToDelete} Records Permanently
+        </button>
+      `);
+    }
+
+    function setCleanupPeriod(period) {
+      triggerHaptic();
+      cleanupConfig.period = period;
+      renderCleanupModalView();
+    }
+
+    function onCustomDateChange() {
+      const fromEl = document.getElementById('cleanupFrom');
+      const toEl = document.getElementById('cleanupTo');
+      if (fromEl) cleanupConfig.fromDate = fromEl.value;
+      if (toEl) cleanupConfig.toDate = toEl.value;
+      renderCleanupModalView();
+    }
+
+    function toggleCleanupType(key, isChecked) {
+      triggerHaptic();
+      cleanupConfig[key] = isChecked;
+      renderCleanupModalView();
+    }
+
+    function getCleanupMatches() {
+      let cutoff = '';
+      const d = new Date();
+      if (cleanupConfig.period === '6m') {
+        d.setMonth(d.getMonth() - 6);
+        cutoff = d.toISOString().split('T')[0];
+      } else if (cleanupConfig.period === '1y') {
+        d.setFullYear(d.getFullYear() - 1);
+        cutoff = d.toISOString().split('T')[0];
+      } else if (cleanupConfig.period === '2y') {
+        d.setFullYear(d.getFullYear() - 2);
+        cutoff = d.toISOString().split('T')[0];
+      } else if (cleanupConfig.period === '5y') {
+        d.setFullYear(d.getFullYear() - 5);
+        cutoff = d.toISOString().split('T')[0];
+      }
+
+      const isCustom = cleanupConfig.period === 'custom';
+      const from = cleanupConfig.fromDate;
+      const to = cleanupConfig.toDate;
+
+      function matchesDate(dateStr) {
+        if (!dateStr) return false;
+        if (isCustom) {
+          if (from && dateStr < from) return false;
+          if (to && dateStr > to) return false;
+          return Boolean(from || to);
+        }
+        return Boolean(cutoff && dateStr < cutoff);
+      }
+
+      let attDays = 0;
+      if (cleanupConfig.cleanAttendance) {
+        Object.keys(appData.attendance || {}).forEach(date => {
+          if (matchesDate(date)) attDays++;
+        });
+      }
+
+      let diaryCount = 0;
+      if (cleanupConfig.cleanDiary) {
+        (appData.diary || []).forEach(item => {
+          if (matchesDate(item.date)) diaryCount++;
+        });
+      }
+
+      let payCount = 0;
+      if (cleanupConfig.cleanPayments) {
+        (appData.payments || []).forEach(p => {
+          if (matchesDate(p.date)) payCount++;
+        });
+      }
+
+      const totalToDelete = attDays + diaryCount + payCount;
+      return { cutoff, isCustom, from, to, attDays, diaryCount, payCount, totalToDelete };
+    }
+
+    function executeDataCleanup() {
+      triggerHaptic();
+      const matches = getCleanupMatches();
+      if (matches.totalToDelete === 0) {
+        alert('No records found matching the selected timeframe.\n(चुनी गई अवधि में कोई पुराना रिकॉर्ड नहीं मिला।)');
+        return;
+      }
+
+      const periodDesc = cleanupConfig.period === 'custom'
+        ? `between ${cleanupConfig.fromDate || 'start'} and ${cleanupConfig.toDate || 'today'}`
+        : `older than ${cleanupConfig.period.replace('m', ' months').replace('y', ' year(s)')} (before ${matches.cutoff})`;
+
+      const confirmMsg = `⚠️ Are you sure you want to permanently delete ${matches.totalToDelete} records ${periodDesc}?\n\n`
+        + `• ${matches.attDays} Attendance Days\n`
+        + `• ${matches.diaryCount} Farm Diary Logs\n`
+        + `• ${matches.payCount} Payment Records\n\n`
+        + `Worker profiles will stay safe.\nThis action cannot be undone.`;
+
+      if (!confirm(confirmMsg)) return;
+
+      function matchesDate(dateStr) {
+        if (!dateStr) return false;
+        if (matches.isCustom) {
+          if (matches.from && dateStr < matches.from) return false;
+          if (matches.to && dateStr > matches.to) return false;
+          return Boolean(matches.from || matches.to);
+        }
+        return Boolean(matches.cutoff && dateStr < matches.cutoff);
+      }
+
+      if (cleanupConfig.cleanAttendance) {
+        Object.keys(appData.attendance || {}).forEach(date => {
+          if (matchesDate(date)) {
+            delete appData.attendance[date];
+          }
+        });
+      }
+
+      if (cleanupConfig.cleanDiary) {
+        appData.diary = (appData.diary || []).filter(item => !matchesDate(item.date));
+      }
+
+      if (cleanupConfig.cleanPayments) {
+        appData.payments = (appData.payments || []).filter(p => !matchesDate(p.date));
+      }
+
+      saveData();
+      showToast(`Cleaned ${matches.totalToDelete} Old Records ✓`);
+      closeModal();
+
+      if (currentTab === 'attendance') renderAttendance();
+      if (currentTab === 'wages') renderWages();
+      if (currentTab === 'diary') renderDiary();
+      if (currentTab === 'workers') renderWorkers();
+    }
+
+    function setCurrency(symbol) {
+      triggerHaptic();
+      appData.settings.currency = symbol;
+      saveData();
+      showToast(`Currency changed to ${symbol}`);
+      closeModal();
+      if (currentTab === 'attendance') renderAttendance();
+      if (currentTab === 'wages') renderWages();
+      if (currentTab === 'diary') renderDiary();
+      if (currentTab === 'workers') renderWorkers();
+    }
+
+    function exportDataJson() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `Hajri_Farm_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Backup Downloaded ✓');
+    }
+
+    function exportDataExcel() {
+      triggerHaptic();
+      const cur = appData.settings.currency || '₹';
+      const today = new Date().toISOString().split('T')[0];
+
+      // Calculate worker finances
+      let totalEarned = 0;
+      let totalPaid = 0;
+      let totalPending = 0;
+
+      const workerRows = appData.workers.map((w, idx) => {
+        const fin = calculateWorkerFinances(w.id);
+        totalEarned += fin.earned;
+        totalPaid += fin.paid;
+        if (fin.balance > 0) totalPending += fin.balance;
+        const status = fin.balance > 0 ? 'Due (बाक़ी)' : (fin.balance === 0 ? 'Settled (चुकता)' : 'Advance (पेशगी)');
+        return `<tr>
+          <td style="text-align:center;">${idx + 1}</td>
+          <td style="font-weight:bold;">${escapeHtml(w.name)}</td>
+          <td>${escapeHtml(w.role || '-')}</td>
+          <td>${escapeHtml(w.phone || '-')}</td>
+          <td style="text-align:right;">${cur}${w.dailyWage}</td>
+          <td style="text-align:center;">${fin.daysWorked}</td>
+          <td style="text-align:right; font-weight:bold;">${cur}${fin.earned}</td>
+          <td style="text-align:right; color:#28A745;">${cur}${fin.paid}</td>
+          <td style="text-align:right; font-weight:bold; color:${fin.balance > 0 ? '#DC3545' : '#28A745'};">${cur}${fin.balance}</td>
+          <td style="text-align:center;">${status}</td>
+        </tr>`;
+      }).join('');
+
+      // Attendance rows
+      const attendanceDates = Object.keys(appData.attendance).sort().reverse();
+      let attendanceRows = '';
+      attendanceDates.forEach(date => {
+        const rec = appData.attendance[date];
+        appData.workers.forEach(w => {
+          if (rec[w.id]) {
+            const st = rec[w.id];
+            const stLabel = st === 'present' ? 'Present (हाज़िर)' : (st === 'half' ? 'Half Day (आधा दिन)' : 'Absent (छुट्टी)');
+            const wageVal = st === 'present' ? w.dailyWage : (st === 'half' ? w.dailyWage * 0.5 : 0);
+            attendanceRows += `<tr>
+              <td>${date}</td>
+              <td style="font-weight:bold;">${escapeHtml(w.name)}</td>
+              <td>${stLabel}</td>
+              <td style="text-align:right;">${cur}${wageVal}</td>
+            </tr>`;
+          }
+        });
+      });
+
+      // Payment rows
+      const paymentRows = appData.payments.map((p, idx) => {
+        const worker = appData.workers.find(w => w.id === p.workerId);
+        const workerName = worker ? worker.name : 'Unknown';
+        return `<tr>
+          <td style="text-align:center;">${idx + 1}</td>
+          <td>${p.date}</td>
+          <td style="font-weight:bold;">${escapeHtml(workerName)}</td>
+          <td style="text-align:right; font-weight:bold; color:#28A745;">${cur}${p.amount}</td>
+          <td>${escapeHtml(p.method)}</td>
+          <td>${escapeHtml(p.notes || '-')}</td>
+        </tr>`;
+      }).join('');
+
+      // Diary rows
+      const diaryRows = appData.diary.map((d, idx) => {
+        return `<tr>
+          <td style="text-align:center;">${idx + 1}</td>
+          <td>${d.date}</td>
+          <td>${d.type ? d.type.toUpperCase() : '-'}</td>
+          <td style="font-weight:bold;">${escapeHtml(d.name)}</td>
+          <td>${escapeHtml(d.field || '-')}</td>
+          <td>${escapeHtml(d.quantity || '-')}</td>
+          <td style="text-align:right;">${d.cost ? cur + d.cost : '-'}</td>
+          <td>${escapeHtml(d.notes || '-')}</td>
+        </tr>`;
+      }).join('');
+
+      // Construct complete HTML/XML spreadsheet
+      const xlsContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <style>
+          body { font-family: Calibri, Arial, sans-serif; }
+          table { border-collapse: collapse; margin-bottom: 24px; width: 100%; }
+          th { background-color: #1A3926; color: #FFFFFF; font-weight: bold; border: 1px solid #1A3926; padding: 8px 10px; font-size: 11pt; }
+          td { border: 1px solid #D1D1D6; padding: 6px 10px; font-size: 10pt; }
+          .section-banner { background-color: #2E7D32; color: #FFFFFF; font-size: 13pt; font-weight: bold; padding: 8px; }
+          .sub-banner { background-color: #F2F2F7; font-weight: bold; font-size: 11pt; }
+        </style>
+      </head>
+      <body>
+        <!-- Title -->
+        <table>
+          <tr>
+            <td colspan="6" style="font-size:16pt; font-weight:bold; color:#1A3926; border:none;">🌾 HAJRI - FARM ATTENDANCE & WAGES REPORT</td>
+          </tr>
+          <tr>
+            <td colspan="6" style="font-size:10pt; color:#666; border:none;">Generated on: ${today} | 100% Offline Farm Records</td>
+          </tr>
+        </table>
+
+        <!-- Financial Summary -->
+        <table>
+          <tr>
+            <td colspan="4" class="section-banner">1. Farm Financial Summary (कुल वित्तीय विवरण)</td>
+          </tr>
+          <tr class="sub-banner">
+            <td>Total Active Workers</td>
+            <td>Total Wages Earned</td>
+            <td>Total Wages Paid</td>
+            <td style="color:#DC3545;">Total Balance Owed</td>
+          </tr>
+          <tr>
+            <td style="font-size:12pt; font-weight:bold;">${appData.workers.length} Workers</td>
+            <td style="font-size:12pt; font-weight:bold;">${cur}${totalEarned}</td>
+            <td style="font-size:12pt; font-weight:bold; color:#28A745;">${cur}${totalPaid}</td>
+            <td style="font-size:12pt; font-weight:bold; color:#DC3545;">${cur}${totalPending}</td>
+          </tr>
+        </table>
+
+        <!-- Workers Ledger Table -->
+        <table>
+          <tr>
+            <td colspan="10" class="section-banner">2. Worker Ledger & Balance Sheet (मज़दूर खाता बही)</td>
+          </tr>
+          <tr>
+            <th>#</th>
+            <th>Worker Name</th>
+            <th>Role / Work</th>
+            <th>Phone</th>
+            <th>Daily Wage Rate</th>
+            <th>Days Worked</th>
+            <th>Total Earned</th>
+            <th>Total Paid</th>
+            <th>Balance Due</th>
+            <th>Status</th>
+          </tr>
+          ${workerRows || '<tr><td colspan="10" style="text-align:center;">No workers found</td></tr>'}
+        </table>
+
+        <!-- Payments Ledger Table -->
+        <table>
+          <tr>
+            <td colspan="6" class="section-banner">3. Payment Transactions Ledger (दिए गए रुपये का विवरण)</td>
+          </tr>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Worker Name</th>
+            <th>Amount Paid</th>
+            <th>Payment Mode</th>
+            <th>Notes / Remarks</th>
+          </tr>
+          ${paymentRows || '<tr><td colspan="6" style="text-align:center;">No payments recorded</td></tr>'}
+        </table>
+
+        <!-- Attendance Log Table -->
+        <table>
+          <tr>
+            <td colspan="4" class="section-banner">4. Attendance History (दैनिक हाज़िरी रिकॉर्ड)</td>
+          </tr>
+          <tr>
+            <th>Date</th>
+            <th>Worker Name</th>
+            <th>Attendance Status</th>
+            <th>Wage Value</th>
+          </tr>
+          ${attendanceRows || '<tr><td colspan="4" style="text-align:center;">No attendance records found</td></tr>'}
+        </table>
+
+        <!-- Farm Diary Table -->
+        <table>
+          <tr>
+            <td colspan="8" class="section-banner">5. Farm Diary - Sprays & Fertilizers (खेत डायरी)</td>
+          </tr>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Chemical / Fertilizer / Task</th>
+            <th>Field / Crop</th>
+            <th>Quantity</th>
+            <th>Cost Incurred</th>
+            <th>Notes</th>
+          </tr>
+          ${diaryRows || '<tr><td colspan="8" style="text-align:center;">No diary entries logged</td></tr>'}
+        </table>
+      </body>
+      </html>`;
+
+      const blob = new Blob([xlsContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = URL.createObjectURL(blob);
+      downloadAnchor.download = `Hajri_Farm_Report_${today}.xls`;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      URL.revokeObjectURL(downloadAnchor.href);
+      showToast('Excel (.xls) Downloaded ✓');
+    }
+
+    function importDataJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && parsed.workers) {
+            appData = parsed;
+            saveData();
+            showToast('Backup Restored Successfully ✓');
+            closeModal();
+            location.reload();
+          } else {
+            alert('Invalid backup file.');
+          }
+        } catch (err) {
+          alert('Could not read backup file.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetToSampleData() {
+      if (confirm('Reset all farm data back to sample values? (क्या आप रीसेट करना चाहते हैं?)')) {
+        appData = getDefaultData();
+        saveData();
+        showToast('Reset to Sample Data ✓');
+        closeModal();
+        location.reload();
+      }
+    }
+
+    // Modal Helpers
+    function renderModalSheet(contentHtml) {
+      const container = document.getElementById('modalContainer');
+      container.innerHTML = `
+        <div id="sheetOverlay" class="sheet-overlay active" onclick="handleOverlayClick(event)">
+          <div class="sheet-content">
+            <div class="sheet-handle"></div>
+            ${contentHtml}
+          </div>
+        </div>
+      `;
+      document.body.style.overflow = 'hidden';
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target && e.target.id === 'sheetOverlay') {
+        closeModal();
+      }
+    }
+
+    function closeModal() {
+      const container = document.getElementById('modalContainer');
+      container.innerHTML = '';
+      document.body.style.overflow = '';
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Initialize App
+    window.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      renderAttendance();
+    });
+  </script>
+</body>
+</html>

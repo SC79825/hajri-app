@@ -1,0 +1,6 @@
+{
+  "name": "Hajri - Farm Attendance & Wage Tracker",
+  "description": "A mobile-first, native iOS styled farm management app for daily worker attendance, wages & payment ledger, farm diary, and worker records.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
