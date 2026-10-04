@@ -975,12 +975,20 @@
   <div id="toastMessage" class="toast">Action Saved</div>
 
   <script>
+    // --- Helper to format local Date to YYYY-MM-DD reliably without UTC offset issues ---
+    function formatDateToYYYYMMDD(d) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
     // --- State & Storage Key ---
     const STORAGE_KEY = 'hajri_farm_data_v2';
 
     // Initial default mock data if first time opening app
     function getDefaultData() {
-      const today = new Date().toISOString().split('T')[0];
+      const today = formatDateToYYYYMMDD(new Date());
       const d1 = getOffsetDate(-1);
       const d2 = getOffsetDate(-2);
       const d3 = getOffsetDate(-3);
@@ -1019,12 +1027,12 @@
     function getOffsetDate(daysOffset) {
       const d = new Date();
       d.setDate(d.getDate() + daysOffset);
-      return d.toISOString().split('T')[0];
+      return formatDateToYYYYMMDD(d);
     }
 
     // App state
     let appData = null;
-    let selectedDate = new Date().toISOString().split('T')[0];
+    let selectedDate = formatDateToYYYYMMDD(new Date());
     let currentTab = 'attendance';
 
     // Load Data
@@ -1082,13 +1090,16 @@
     function formatDateDisplay(dateStr) {
       if (!dateStr) return '';
       const [y, m, d] = dateStr.split('-');
-      const dateObj = new Date(Number(y), Number(m) - 1, Number(d));
-      const today = new Date().toISOString().split('T')[0];
+      // Use noon (12:00:00) to avoid any DST or timezone border problems
+      const dateObj = new Date(Number(y), Number(m) - 1, Number(d), 12, 0, 0);
+      const today = formatDateToYYYYMMDD(new Date());
       const yesterday = getOffsetDate(-1);
+      const tomorrow = getOffsetDate(1);
 
       let dayTag = '';
       if (dateStr === today) dayTag = 'Today';
       else if (dateStr === yesterday) dayTag = 'Yesterday';
+      else if (dateStr === tomorrow) dayTag = 'Tomorrow';
 
       const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
       const formatted = dateObj.toLocaleDateString('en-IN', options);
@@ -1130,9 +1141,10 @@
     function changeDate(delta) {
       triggerHaptic();
       const [y, m, d] = selectedDate.split('-');
-      const cur = new Date(Number(y), Number(m) - 1, Number(d));
+      // Set to 12:00:00 noon local time to completely prevent any midnight UTC timezone shifts
+      const cur = new Date(Number(y), Number(m) - 1, Number(d), 12, 0, 0);
       cur.setDate(cur.getDate() + delta);
-      selectedDate = cur.toISOString().split('T')[0];
+      selectedDate = formatDateToYYYYMMDD(cur);
       renderAttendance();
     }
 
@@ -1374,7 +1386,7 @@
     // Record Payment Modal
     function openPaymentModal(preselectedWorkerId = '') {
       triggerHaptic();
-      const today = new Date().toISOString().split('T')[0];
+      const today = formatDateToYYYYMMDD(new Date());
       const activeWorkers = appData.workers.filter(w => w.active !== false);
 
       if (activeWorkers.length === 0) {
@@ -1685,7 +1697,7 @@
 
     function openDiaryModal() {
       triggerHaptic();
-      const today = new Date().toISOString().split('T')[0];
+      const today = formatDateToYYYYMMDD(new Date());
 
       renderModalSheet(`
         <div class="sheet-header">
@@ -2124,8 +2136,8 @@
       const now = new Date();
       const sixAgo = new Date();
       sixAgo.setMonth(sixAgo.getMonth() - 6);
-      cleanupConfig.toDate = now.toISOString().split('T')[0];
-      cleanupConfig.fromDate = sixAgo.toISOString().split('T')[0];
+      cleanupConfig.toDate = formatDateToYYYYMMDD(now);
+      cleanupConfig.fromDate = formatDateToYYYYMMDD(sixAgo);
 
       renderCleanupModalView();
     }
@@ -2258,16 +2270,16 @@
       const d = new Date();
       if (cleanupConfig.period === '6m') {
         d.setMonth(d.getMonth() - 6);
-        cutoff = d.toISOString().split('T')[0];
+        cutoff = formatDateToYYYYMMDD(d);
       } else if (cleanupConfig.period === '1y') {
         d.setFullYear(d.getFullYear() - 1);
-        cutoff = d.toISOString().split('T')[0];
+        cutoff = formatDateToYYYYMMDD(d);
       } else if (cleanupConfig.period === '2y') {
         d.setFullYear(d.getFullYear() - 2);
-        cutoff = d.toISOString().split('T')[0];
+        cutoff = formatDateToYYYYMMDD(d);
       } else if (cleanupConfig.period === '5y') {
         d.setFullYear(d.getFullYear() - 5);
-        cutoff = d.toISOString().split('T')[0];
+        cutoff = formatDateToYYYYMMDD(d);
       }
 
       const isCustom = cleanupConfig.period === 'custom';
@@ -2378,10 +2390,11 @@
     }
 
     function exportDataJson() {
+      const today = formatDateToYYYYMMDD(new Date());
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `Hajri_Farm_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      downloadAnchor.setAttribute("download", `Hajri_Farm_Backup_${today}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -2391,7 +2404,7 @@
     function exportDataExcel() {
       triggerHaptic();
       const cur = appData.settings.currency || '₹';
-      const today = new Date().toISOString().split('T')[0];
+      const today = formatDateToYYYYMMDD(new Date());
 
       // Calculate worker finances
       let totalEarned = 0;
